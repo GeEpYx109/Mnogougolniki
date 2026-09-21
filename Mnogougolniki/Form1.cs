@@ -25,24 +25,44 @@ namespace Mnogougolniki
 
     class Shape
     {
-        int x ;
+        int x;
         int y;
         static int R;
-        static string Color;
+        static Color c;
+
+        public Shape(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+        static Shape() {
+            R = 10;
+            c = Color.Red;
+        }
     }
 
     class Circle : Shape
     {
 
+        public Circle(int x, int y) : base(x, y)
+        {
+        }
     }
-    
+
     class Triangle : Shape
     {
 
+        public Triangle(int x, int y) : base(x, y)
+        {
+        }
     }
-    
+
     class Square : Shape
     {
 
+        public Square(int x, int y) : base(x, y)
+        {
+        }
     }
 }
