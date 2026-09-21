@@ -28,9 +28,9 @@ namespace Mnogougolniki
 
             Circle a = new Circle(100, 100);
             a.Draw(G);
-            Triangle b = new Triangle(400, 200);
+            Triangle b = new Triangle(100, 100);
             b.Draw(G);
-            Square c = new Square(600, 300);
+            Square c = new Square(100, 100);
             c.Draw(G);
         }
     }
