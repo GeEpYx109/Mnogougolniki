@@ -42,6 +42,7 @@ namespace Mnogougolniki
 
         public override void Draw(Graphics G)
         {
+            Pen p = new Pen(Color.Red);
             G.DrawEllipse(p, x - R, y - R, R * 2, R * 2);
         }
 

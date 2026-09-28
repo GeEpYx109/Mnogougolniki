@@ -34,7 +34,9 @@ namespace Mnogougolniki
             Graphics G = e.Graphics;
 
             a.Draw(G);
+            Triangle b = new Triangle(400, 200);
             b.Draw(G);
+            Square c = new Square(600, 300);
             c.Draw(G);
         }
 
