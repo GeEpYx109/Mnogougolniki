@@ -12,9 +12,16 @@ namespace Mnogougolniki
 {
     public partial class Form1 : Form
     {
+        Circle a;
+        Triangle b;
+        Square c;
         public Form1()
         {
             InitializeComponent();
+            a = new Circle(100,100);
+            b = new Triangle(100,100);
+            c = new Square(100,100);
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -26,12 +33,14 @@ namespace Mnogougolniki
         {
             Graphics G = e.Graphics;
 
-            Circle a = new Circle(100, 100);
             a.Draw(G);
-            Triangle b = new Triangle(400, 200);
             b.Draw(G);
-            Square c = new Square(600, 300);
             c.Draw(G);
+        }
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+
         }
     }
 }
