@@ -17,6 +17,7 @@ namespace Mnogougolniki
         Square c;
         int lastX;
         int lastY;
+        bool isMoving = false;
         public Form1()
         {
             InitializeComponent();
@@ -68,18 +69,22 @@ namespace Mnogougolniki
             {
                 a.X += movex;
                 a.Y += movey;
+                isMoving = true;
             }
             if (b.Touched)
             {
                 b.X += movex;
                 b.Y += movey;
+                isMoving = true;
             }
             if (c.Touched)
             {
                 c.X += movex;
                 c.Y += movey;
+                isMoving = true;
             }
-            Refresh();
+            if (isMoving) Refresh();
+            isMoving = false;
         }
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
