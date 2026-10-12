@@ -19,17 +19,14 @@ namespace Mnogougolniki
         int lastY;
         bool isMoving = false;
         enum vibor {Circle, Square, Triangle};
-        int figura = 0;
+        vibor figura = vibor.Circle;
 
         List <Shape> shapes;
         public Form1()
         {
             InitializeComponent();
-            DoubleBuffered = true;// спроси можно ли это использовать
-            a = new Circle(100,100);
-            b = new Triangle(200,200);
-            c = new Square(500,500);
-            shapes = new List <Shape> { a, b, c };
+            DoubleBuffered = true;
+            shapes = new List <Shape> ();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -61,7 +58,19 @@ namespace Mnogougolniki
             lastY = e.Y;
             if (!isInsideAny)
             {
-                shapes.Add(new Circle(e.X, e.Y));
+                switch (figura)
+                {
+                    case (vibor.Circle):
+                        shapes.Add(new Circle(e.X, e.Y));
+                        break;
+                    case (vibor.Square):
+                        shapes.Add(new Square(e.X, e.Y));
+                        break;
+                    case (vibor.Triangle):
+                        shapes.Add(new Triangle(e.X, e.Y));
+                        break;
+
+                }
                 Refresh();
             }
         }
@@ -95,17 +104,17 @@ namespace Mnogougolniki
 
         private void circleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            figura = 0;
+            figura = vibor.Circle;
         }
 
         private void squareToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            figura = 1;
+            figura = vibor.Square;
         }
 
-        private void triangelToolStripMenuItem_Click(object sender, EventArgs e)
+        private void triangleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            figura = 2;
+            figura = vibor.Triangle;
         }
     }
 }
