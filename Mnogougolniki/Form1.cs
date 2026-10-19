@@ -12,9 +12,7 @@ namespace Mnogougolniki
 {
     public partial class Form1 : Form
     {
-        Circle a;
-        Triangle b;
-        Square c;
+        Pen hull1 = new Pen(Color.Green);
         int lastX;
         int lastY;
         bool isMoving = false;
@@ -41,37 +39,53 @@ namespace Mnogougolniki
             {
                 s.Draw(G);
             }
+            drawhull(G);
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             bool isInsideAny = false;
-            foreach (Shape s in shapes)
+            if (e.Button == MouseButtons.Left)
             {
-                if (s.IsInside(e.X, e.Y))
+                foreach (Shape s in shapes)
                 {
-                    s.Touched = true;
-                    isInsideAny = true;
+                    if (s.IsInside(e.X, e.Y))
+                    {
+                        s.Touched = true;
+                        isInsideAny = true;
+                    }
+                }
+                lastX = e.X;
+                lastY = e.Y;
+                if (!isInsideAny)
+                {
+                    switch (figura)
+                    {
+                        case (vibor.Circle):
+                            shapes.Add(new Circle(e.X, e.Y));
+                            break;
+                        case (vibor.Square):
+                            shapes.Add(new Square(e.X, e.Y));
+                            break;
+                        case (vibor.Triangle):
+                            shapes.Add(new Triangle(e.X, e.Y));
+                            break;
+
+                    }
+                    Refresh();
                 }
             }
-            lastX = e.X;
-            lastY = e.Y;
-            if (!isInsideAny)
+            else if (e.Button == MouseButtons.Right)
             {
-                switch (figura)
+                for (int i = shapes.Count - 1; i >= 0; i--)
                 {
-                    case (vibor.Circle):
-                        shapes.Add(new Circle(e.X, e.Y));
+                    if (shapes[i].IsInside(e.X, e.Y))
+                    {
+                        shapes.RemoveAt(i);
+                        Refresh();
                         break;
-                    case (vibor.Square):
-                        shapes.Add(new Square(e.X, e.Y));
-                        break;
-                    case (vibor.Triangle):
-                        shapes.Add(new Triangle(e.X, e.Y));
-                        break;
-
+                    } 
                 }
-                Refresh();
             }
         }
 
@@ -81,13 +95,16 @@ namespace Mnogougolniki
             int movey = e.Y - lastY;
             lastX = e.X;
             lastY = e.Y;
-            foreach(Shape s in shapes)
+            if (e.Button == MouseButtons.Left)
             {
-                if (s.Touched)
+                foreach (Shape s in shapes)
                 {
-                    s.X += movex;
-                    s.Y += movey;
-                    isMoving = true;
+                    if (s.Touched)
+                    {
+                        s.X += movex;
+                        s.Y += movey;
+                        isMoving = true;
+                    }
                 }
             }
             if (isMoving) Refresh();
@@ -115,6 +132,32 @@ namespace Mnogougolniki
         private void triangleToolStripMenuItem_Click(object sender, EventArgs e)
         {
             figura = vibor.Triangle;
+        }
+
+        private void drawhull(Graphics G)
+        {
+            if (shapes.Count >= 3)
+            {
+                for(int i = 0; i <= shapes.Count - 1; i++)
+                {
+                    for (int j = i + 1; j <= shapes.Count - 1; j++)
+                    {
+                        int ups = 0;
+                        int downs = 0;
+                        double k = (double)(shapes[i].Y - shapes[j].Y) / (shapes[i].X - shapes[j].X);
+                        double b = shapes[i].Y - k * shapes[i].X;
+                        for (int p = 0; p <=shapes.Count - 1; p++)
+                        {
+                            if (shapes[p].Y > (k * shapes[p].X + b)) ups += 1;
+                            else if (shapes[p].Y < (k * shapes[p].X + b))downs += 1;
+                            if (downs == 0 || ups == 0)
+                            {
+                                G.DrawLine(hull1, shapes[i].X, shapes[i].Y, shapes[j].X, shapes[j].Y);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
