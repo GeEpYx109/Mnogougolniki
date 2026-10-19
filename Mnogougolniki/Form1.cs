@@ -144,16 +144,31 @@ namespace Mnogougolniki
                     {
                         int ups = 0;
                         int downs = 0;
-                        double k = (double)(shapes[i].Y - shapes[j].Y) / (shapes[i].X - shapes[j].X);
-                        double b = shapes[i].Y - k * shapes[i].X;
+                        bool k0 = shapes[i].X == shapes[j].X;
+                        double k = 0;
+                        double b = 0;
+                        if(!k0)
+                        {
+                            k = (double)(shapes[i].Y - shapes[j].Y) / (shapes[i].X - shapes[j].X);
+                            b = shapes[i].Y - k * shapes[i].X;
+                        }
                         for (int p = 0; p <=shapes.Count - 1; p++)
                         {
-                            if (shapes[p].Y > (k * shapes[p].X + b)) ups += 1;
-                            else if (shapes[p].Y < (k * shapes[p].X + b))downs += 1;
-                            if (downs == 0 || ups == 0)
+                            if (p == i || p == j) continue;
+                            if (k0)
                             {
-                                G.DrawLine(hull1, shapes[i].X, shapes[i].Y, shapes[j].X, shapes[j].Y);
+                                if (shapes[p].X > shapes[i].X) ups++;
+                                else if (shapes[p].X < shapes[i].X) downs++;
                             }
+                            else
+                            {
+                                if (shapes[p].Y > (k * shapes[p].X + b)) ups += 1;
+                                else if (shapes[p].Y < (k * shapes[p].X + b)) downs += 1;
+                            }
+                        }
+                        if (downs == 0 || ups == 0)
+                        {
+                            G.DrawLine(hull1, shapes[i].X, shapes[i].Y, shapes[j].X, shapes[j].Y);
                         }
                     }
                 }
