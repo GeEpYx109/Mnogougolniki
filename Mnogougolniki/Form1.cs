@@ -113,15 +113,21 @@ namespace Mnogougolniki
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
-            for (int i = 0; i < shapes.Count; i++)
+            foreach (Shape s in shapes)
             {
-                if (shapes.Count >= 3 && shapes[i].Connected == false)
+                s.Touched = false;
+            }
+            if (shapes.Count >= 3)
+            {
+                for (int i = shapes.Count - 1; i >= 0; i--)
                 {
-                    shapes[i].Touched = false;
-                    shapes.RemoveAt(i);
-                    Refresh();
+                    if (!shapes[i].Connected)
+                    {
+                        shapes.RemoveAt(i);
+                    }
                 }
             }
+            Refresh();
         }
 
         private void circleToolStripMenuItem_Click(object sender, EventArgs e)
