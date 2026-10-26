@@ -17,12 +17,14 @@ namespace Mnogougolniki
         protected static Pen p;
         protected bool touched;// можно ли сделать паблик или лучше свойствами, как я реализовал
         protected static Brush br;
+        protected bool connected;
 
         public Shape(int x, int y)
         {
             this.x = x;
             this.y = y;
             touched = false;
+            connected = false;
         }
 
         static Shape()
@@ -66,6 +68,18 @@ namespace Mnogougolniki
             set
             {
                 y = value;
+            }
+        }
+
+        public bool Connected
+        {
+            get
+            {
+                return connected;
+            }
+            set
+            {
+                connected = value;
             }
         }
 

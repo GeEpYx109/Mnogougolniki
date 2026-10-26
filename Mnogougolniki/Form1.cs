@@ -113,9 +113,14 @@ namespace Mnogougolniki
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
-            foreach (Shape s in shapes)
+            for (int i = 0; i < shapes.Count; i++)
             {
-                s.Touched = false;
+                if (shapes.Count >= 3 && shapes[i].Connected == false)
+                {
+                    shapes[i].Touched = false;
+                    shapes.RemoveAt(i);
+                    Refresh();
+                }
             }
         }
 
@@ -138,7 +143,11 @@ namespace Mnogougolniki
         {
             if (shapes.Count >= 3)
             {
-                for(int i = 0; i <= shapes.Count - 1; i++)
+                foreach (Shape s in shapes)
+                {
+                    s.Connected = false;
+                }
+                for (int i = 0; i <= shapes.Count - 1; i++)
                 {
                     for (int j = i + 1; j <= shapes.Count - 1; j++)
                     {
@@ -169,6 +178,8 @@ namespace Mnogougolniki
                         if (downs == 0 || ups == 0)
                         {
                             G.DrawLine(hull1, shapes[i].X, shapes[i].Y, shapes[j].X, shapes[j].Y);
+                            shapes[i].Connected = true;
+                            shapes[j].Connected = true;
                         }
                     }
                 }
