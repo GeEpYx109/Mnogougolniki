@@ -35,11 +35,20 @@ namespace Mnogougolniki
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics G = e.Graphics;
-            foreach(Shape s in shapes)
-            {
-                s.Draw(G);
-            }
             drawhull(G);
+            for(int i = 0; i < shapes.Count - 1; i++)
+            {
+                shapes[i].Draw(G);
+            }
+            int final = shapes.Count - 1;
+            if (final>=0)
+            {
+                if (final <= 2)
+                    shapes[final].Draw(G);
+                else
+                    if (shapes[final].Connected == true) shapes[final].Draw(G);
+
+            }
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
