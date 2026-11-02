@@ -18,6 +18,7 @@ namespace Mnogougolniki
         bool isMoving = false;
         enum vibor {Circle, Square, Triangle};
         vibor figura = vibor.Circle;
+        bool isInsideAny;
 
         List <Shape> shapes;
         public Form1()
@@ -46,14 +47,14 @@ namespace Mnogougolniki
                 if (final <= 2)
                     shapes[final].Draw(G);
                 else
-                    if (shapes[final].Connected == true) shapes[final].Draw(G);
+                    if (shapes[final].Connected == true || isInsideAny == true) shapes[final].Draw(G);
 
             }
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            bool isInsideAny = false;
+            isInsideAny = false;
             if (e.Button == MouseButtons.Left)
             {
                 foreach (Shape s in shapes)
