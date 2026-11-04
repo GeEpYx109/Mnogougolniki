@@ -32,7 +32,7 @@ namespace Mnogougolniki
         {
 
         }
-
+    
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics G = e.Graphics;
@@ -69,20 +69,29 @@ namespace Mnogougolniki
                 lastY = e.Y;
                 if (!isInsideAny)
                 {
-                    switch (figura)
+                    if (shapes.Count >= 3 && IsInsideHull(e.X, e.Y))
                     {
-                        case (vibor.Circle):
-                            shapes.Add(new Circle(e.X, e.Y));
-                            break;
-                        case (vibor.Square):
-                            shapes.Add(new Square(e.X, e.Y));
-                            break;
-                        case (vibor.Triangle):
-                            shapes.Add(new Triangle(e.X, e.Y));
-                            break;
-
+                        foreach (Shape s in shapes)
+                        {
+                            s.Touched = true;
+                        }
                     }
-                    Refresh();
+                    else
+                    {
+                        switch (figura)
+                        {
+                            case (vibor.Circle):
+                                shapes.Add(new Circle(e.X, e.Y));
+                                break;
+                            case (vibor.Square):
+                                shapes.Add(new Square(e.X, e.Y));
+                                break;
+                            case (vibor.Triangle):
+                                shapes.Add(new Triangle(e.X, e.Y));
+                                break;
+                        }
+                        Refresh();
+                    }
                 }
             }
             else if (e.Button == MouseButtons.Right)
@@ -200,6 +209,66 @@ namespace Mnogougolniki
                     }
                 }
             }
+        }
+
+        private bool IsInsideHull(int mx, int my)
+        {
+            bool isinside = false;
+
+            for (int i = 0; i < shapes.Count; i++)
+            {
+                for (int j = i + 1; j < shapes.Count; j++)
+                {
+                    int ups = 0;
+                    int downs = 0;
+
+                    bool k0 = shapes[i].X == shapes[j].X;
+                    double k = 0;
+                    double b = 0;
+                    if (!k0)
+                    {
+                        k = (double)(shapes[i].Y - shapes[j].Y) / (shapes[i].X - shapes[j].X);
+                        b = shapes[i].Y - k * shapes[i].X;
+                    }
+
+                    for (int p = 0; p < shapes.Count; p++)
+                    {
+                        if (p == i || p == j) continue;
+
+                        if (k0)
+                        {
+                            if (shapes[p].X > shapes[i].X) ups++;
+                            else if (shapes[p].X < shapes[i].X) downs++;
+                        }
+                        else
+                        {
+                            if (shapes[p].Y > (k * shapes[p].X + b)) ups++;
+                            else if (shapes[p].Y < (k * shapes[p].X + b)) downs++;
+                        }
+                    }
+
+                    if (ups == 0 || downs == 0)
+                    {
+                        bool mouseUp;
+                        bool mouseDown;
+                        if (k0)
+                        {
+                            mouseUp = mx > shapes[i].X;
+                            mouseDown = mx < shapes[i].X;
+                        }
+                        else
+                        {
+                            mouseUp = my > (k * mx + b);
+                            mouseDown = my < (k * mx + b);
+                        }
+
+                        if (ups > 0 && mouseDown) return false;
+                        if (downs > 0 && mouseUp) return false;
+                        isinside = true;
+                    }
+                }
+            }
+            return isinside;
         }
     }
 }
