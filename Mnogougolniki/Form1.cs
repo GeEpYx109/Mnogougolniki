@@ -213,48 +213,48 @@ namespace Mnogougolniki
 
         private void drawhullJarvis(Graphics G)
         {
-            Shape first;
-            Shape lowest;
-
-            if (shapes.Count >= 3)
+            if (shapes.Count < 3) return;
+            foreach (Shape s in shapes) s.Connected = false;
+            Shape first = shapes[0];
+            foreach (Shape s in shapes)
             {
-                do
-                {
-                    lowest = shapes[0];
-                    for (int i = 0; i < shapes.Count; i++)
-                    {
-                        if (shapes[i].Y > lowest.Y)
-                        {
-                            lowest = shapes[i];
-                        }
-                        else if (shapes[i].Y == lowest.Y)
-                        {
-                            if (shapes[i].X < lowest.X) lowest = shapes[i];
-                        }
-                    }
-                    first = lowest;
-                    double cos = 0;
-                    Shape dot2 = shapes[0];
-
-                    for (int i = 0; i < shapes.Count; i++)
-                    {
-                        double costemp;
-                        if (lowest == shapes[i]) continue;
-                        costemp = (lowest.X - lowest.X + 100) * (lowest.X - shapes[i].X) / 100 / Math.Sqrt((lowest.X - shapes[i].X) * (lowest.X - shapes[i].X) + (lowest.Y - shapes[i].Y) * (lowest.Y - shapes[i].Y));
-                        if (costemp > cos)
-                        {
-                            cos = costemp;
-                            dot2 = shapes[i];
-                        }
-                    }
-                    lowest.Connected = true;
-                    dot2.Connected = true;
-                    lowest.Connected = true;
-                    dot2.Connected = true;
-                    G.DrawLine(hull1, lowest.X, lowest.Y, dot2.X, dot2.Y);
-                    lowest = dot2;
-                } while (lowest != first);
+                if (s.Y > first.Y || (s.Y == first.Y && s.X < first.X))
+                    first = s;
             }
+
+            Shape current = first;
+            double dX = 1;
+            double dY = 0;
+
+            do
+            {
+                Shape next = null;
+                double cos = -2;
+                double best = 0;
+
+                foreach (Shape s in shapes)
+                {
+                    if (s == current) continue;
+                    double vx = s.X - current.X;//вектор от текущей вершины к проверяемой фигуре
+                    double vy = s.Y - current.Y;
+                    double distance = Math.Sqrt(vx * vx + vy * vy);
+
+                    double costemp = (dX * vx + dY * vy)
+                                     / (Math.Sqrt(dX * dX + dY * dY) * distance);
+                    if (costemp > cos)
+                    {
+                        cos = costemp;
+                        next = s;
+                    }
+                }
+                current.Connected = true;
+                next.Connected = true;
+
+                G.DrawLine(hull1, current.X, current.Y, next.X, next.Y);
+                dX = next.X - current.X;
+                dY = next.Y - current.Y;
+                current = next;
+            } while (current != first);
         }
         private bool IsInsideHull(int mx, int my)
         {
