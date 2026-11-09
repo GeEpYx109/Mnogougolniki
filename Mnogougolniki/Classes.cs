@@ -29,7 +29,7 @@ namespace Mnogougolniki
 
         static Shape()
         {
-            R = 100;
+            R = 30;
             c = Color.Red;
             p = new Pen(c);
             br = new SolidBrush(Color.LightCoral);

@@ -36,7 +36,7 @@ namespace Mnogougolniki
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics G = e.Graphics;
-            drawhull(G);
+            drawhullJarvis(G);
             for(int i = 0; i < shapes.Count - 1; i++)
             {
                 shapes[i].Draw(G);
@@ -211,6 +211,51 @@ namespace Mnogougolniki
             }
         }
 
+        private void drawhullJarvis(Graphics G)
+        {
+            Shape first;
+            Shape lowest;
+
+            if (shapes.Count >= 3)
+            {
+                do
+                {
+                    lowest = shapes[0];
+                    for (int i = 0; i < shapes.Count; i++)
+                    {
+                        if (shapes[i].Y > lowest.Y)
+                        {
+                            lowest = shapes[i];
+                        }
+                        else if (shapes[i].Y == lowest.Y)
+                        {
+                            if (shapes[i].X < lowest.X) lowest = shapes[i];
+                        }
+                    }
+                    first = lowest;
+                    double cos = 0;
+                    Shape dot2 = shapes[0];
+
+                    for (int i = 0; i < shapes.Count; i++)
+                    {
+                        double costemp;
+                        if (lowest == shapes[i]) continue;
+                        costemp = (lowest.X - lowest.X + 100) * (lowest.X - shapes[i].X) / 100 / Math.Sqrt((lowest.X - shapes[i].X) * (lowest.X - shapes[i].X) + (lowest.Y - shapes[i].Y) * (lowest.Y - shapes[i].Y));
+                        if (costemp > cos)
+                        {
+                            cos = costemp;
+                            dot2 = shapes[i];
+                        }
+                    }
+                    lowest.Connected = true;
+                    dot2.Connected = true;
+                    lowest.Connected = true;
+                    dot2.Connected = true;
+                    G.DrawLine(hull1, lowest.X, lowest.Y, dot2.X, dot2.Y);
+                    lowest = dot2;
+                } while (lowest != first);
+            }
+        }
         private bool IsInsideHull(int mx, int my)
         {
             bool isinside = false;
