@@ -15,6 +15,11 @@ namespace Mnogougolniki
     {
         static Random rnd = new Random();
         Stopwatch sw;
+
+        int[] chartN = { 50, 100, 150, 200, 250, 300, 350, 400, 450, 500 };
+        double[] tDef = new double[10];
+        double[] tJar = new double[10];
+        bool chartReady = false;
         Pen hull1 = new Pen(Color.Green);
         int lastX;
         int lastY;
@@ -31,6 +36,7 @@ namespace Mnogougolniki
         {
             InitializeComponent();
             DoubleBuffered = true;
+            ResizeRedraw = true;
             shapes = new List <Shape> ();
         }
 
@@ -62,19 +68,44 @@ namespace Mnogougolniki
             }
             else
             {
-                List <Shape> charts = new List <Shape>();
-                Pen pen = new Pen(Color.Black);
-                G.DrawLine(pen, 20, 110, 20, 10);
-                G.DrawLine(pen, 20, 110, 600, 110);
-                for(int i = 50; i <= 500; i += 50)
-                {
-                    for (int j = 0; j < i; j++)
-                    {
-                        charts.Add(new Circle(rnd.Next(0, 500), rnd.Next(0, 500)));
-                    }
-                    sw = Stopwatch.StartNew();
+                int left = 60;
+                int right = ClientSize.Width - 40;
+                int top = 60;
+                int bottom = ClientSize.Height - 40;
 
+                Pen axis = new Pen(Color.Black);
+                Pen penDef = new Pen(Color.Blue);
+                Pen penJar = new Pen(Color.Red);
+
+                G.DrawLine(axis, left, bottom, left, top);
+                G.DrawLine(axis, left, bottom, right, bottom);
+
+                double maxT = 0.001;
+                for (int i = 0; i < chartN.Length; i++)
+                    maxT = Math.Max(maxT, Math.Max(tDef[i], tJar[i]));
+                int maxN = chartN[chartN.Length - 1];
+
+                float prevX = left;
+                float prevDefY = bottom;
+                float prevJarY = bottom;
+                for (int i = 0; i < chartN.Length; i++)
+                {
+                    float x = left + (float)(right - left) * chartN[i] / maxN;
+                    float yDef = bottom - (float)((bottom - top) * tDef[i] / maxT);
+                    float yJar = bottom - (float)((bottom - top) * tJar[i] / maxT);
+
+                    G.DrawLine(penDef, prevX, prevDefY, x, yDef);
+                    G.DrawLine(penJar, prevX, prevJarY, x, yJar);
+
+                    prevX = x;
+                    prevDefY = yDef;
+                    prevJarY = yJar;
                 }
+
+                G.DrawString("Def", Font, Brushes.Blue, right - 80, top);
+                G.DrawString("Jarvis", Font, Brushes.Red, right - 80, top + 20);
+                G.DrawString(maxT.ToString("F1") + " мс", Font, Brushes.Black, 5, top);
+                G.DrawString(maxN + " точек", Font, Brushes.Black, right - 50, bottom + 5);
             }
         }
 
@@ -226,7 +257,7 @@ namespace Mnogougolniki
                                 else if (shapes[p].Y < (k * shapes[p].X + b)) downs += 1;
                             }
                         }
-                        if (downs == 0 || ups == 0)
+                        if ((downs == 0 || ups == 0) && G != null)
                         {
                             G.DrawLine(hull1, shapes[i].X, shapes[i].Y, shapes[j].X, shapes[j].Y);
                             shapes[i].Connected = true;
@@ -275,7 +306,10 @@ namespace Mnogougolniki
                 current.Connected = true;
                 next.Connected = true;
 
-                G.DrawLine(hull1, current.X, current.Y, next.X, next.Y);
+                if (G != null)
+                {
+                    G.DrawLine(hull1, current.X, current.Y, next.X, next.Y);
+                }
                 dX = current.X - next.X;
                 dY = current.Y - next.Y;
                 current = next;
@@ -355,8 +389,43 @@ namespace Mnogougolniki
 
         private void chartToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!chartReady) CalcChart();
             algor = algorythm.Chart;
             Refresh();
+        }
+
+        private void CalcChart()
+        {
+            List<Shape> saved = shapes;
+
+            for (int i = 0; i < chartN.Length; i++)
+            {
+                shapes = new List<Shape>();
+                while (shapes.Count < chartN[i])
+                {
+                    int x = rnd.Next(0, 500);
+                    int y = rnd.Next(0, 500);
+
+                    bool exists = false;
+                    foreach (Shape s in shapes)
+                    {
+                        if (s.X == x && s.Y == y) exists = true;
+                    }
+                    if (!exists) shapes.Add(new Circle(x, y));
+                }
+
+                sw = Stopwatch.StartNew();
+                drawhull(null);
+                sw.Stop();
+                tDef[i] = sw.Elapsed.TotalMilliseconds;
+
+                sw = Stopwatch.StartNew();
+                drawhullJarvis(null);
+                sw.Stop();
+                tJar[i] = sw.Elapsed.TotalMilliseconds;
+            }
+            shapes = saved;
+            chartReady = true;
         }
     }
 }
