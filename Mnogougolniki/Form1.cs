@@ -7,11 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Mnogougolniki
 {
     public partial class Form1 : Form
     {
+        static Random rnd = new Random();
+        Stopwatch sw;
         Pen hull1 = new Pen(Color.Green);
         int lastX;
         int lastY;
@@ -19,6 +22,9 @@ namespace Mnogougolniki
         enum vibor {Circle, Square, Triangle};
         vibor figura = vibor.Circle;
         bool isInsideAny;
+
+        enum algorythm {Def, Jar, Chart}
+        algorythm algor = algorythm.Def;
 
         List <Shape> shapes;
         public Form1()
@@ -36,19 +42,39 @@ namespace Mnogougolniki
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics G = e.Graphics;
-            drawhullJarvis(G);
-            for(int i = 0; i < shapes.Count - 1; i++)
+            if (algor == algorythm.Def) drawhull(G);
+            else if (algor == algorythm.Jar) drawhullJarvis (G);
+            if (algor != algorythm.Chart)
             {
-                shapes[i].Draw(G);
-            }
-            int final = shapes.Count - 1;
-            if (final>=0)
-            {
-                if (final <= 2)
-                    shapes[final].Draw(G);
-                else
-                    if (shapes[final].Connected == true || isInsideAny == true) shapes[final].Draw(G);
+                for (int i = 0; i < shapes.Count - 1; i++)
+                {
+                    shapes[i].Draw(G);
+                }
+                int final = shapes.Count - 1;
+                if (final >= 0)
+                {
+                    if (final <= 2)
+                        shapes[final].Draw(G);
+                    else
+                        if (shapes[final].Connected == true || isInsideAny == true) shapes[final].Draw(G);
 
+                }
+            }
+            else
+            {
+                List <Shape> charts = new List <Shape>();
+                Pen pen = new Pen(Color.Black);
+                G.DrawLine(pen, 20, 110, 20, 10);
+                G.DrawLine(pen, 20, 110, 600, 110);
+                for(int i = 50; i <= 500; i += 50)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        charts.Add(new Circle(rnd.Next(0, 500), rnd.Next(0, 500)));
+                    }
+                    sw = Stopwatch.StartNew();
+
+                }
             }
         }
 
@@ -223,25 +249,24 @@ namespace Mnogougolniki
             }
 
             Shape current = first;
-            double dX = 1;
+            double dX = -1;
             double dY = 0;
 
             do
             {
                 Shape next = null;
-                double cos = -2;
-                double best = 0;
+                double cos = 1;
+
 
                 foreach (Shape s in shapes)
                 {
                     if (s == current) continue;
-                    double vx = s.X - current.X;//вектор от текущей вершины к проверяемой фигуре
+                    double vx = s.X - current.X;
                     double vy = s.Y - current.Y;
                     double distance = Math.Sqrt(vx * vx + vy * vy);
 
-                    double costemp = (dX * vx + dY * vy)
-                                     / (Math.Sqrt(dX * dX + dY * dY) * distance);
-                    if (costemp > cos)
+                    double costemp = (dX * vx + dY * vy) / (Math.Sqrt(dX * dX + dY * dY) * distance);
+                    if (costemp < cos)
                     {
                         cos = costemp;
                         next = s;
@@ -251,8 +276,8 @@ namespace Mnogougolniki
                 next.Connected = true;
 
                 G.DrawLine(hull1, current.X, current.Y, next.X, next.Y);
-                dX = next.X - current.X;
-                dY = next.Y - current.Y;
+                dX = current.X - next.X;
+                dY = current.Y - next.Y;
                 current = next;
             } while (current != first);
         }
@@ -314,6 +339,24 @@ namespace Mnogougolniki
                 }
             }
             return isinside;
+        }
+
+        private void byDefinitionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            algor = algorythm.Def;
+            Refresh();
+        }
+
+        private void jarvisToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            algor = algorythm.Jar;
+            Refresh();
+        }
+
+        private void chartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            algor = algorythm.Chart;
+            Refresh();
         }
     }
 }
